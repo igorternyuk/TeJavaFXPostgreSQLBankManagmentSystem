@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" maxHeight="218.0" maxWidth="350.0" minHeight="218.0" minWidth="350.0" prefHeight="218.0" prefWidth="350.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bankmanager.loginsystem.LoginController">
+   <children>
+      <Label layoutX="37.0" layoutY="69.0" text="Login:" />
+      <Label layoutX="37.0" layoutY="121.0" text="Password:" />
+      <Label layoutX="37.0" layoutY="24.0" text="Database status" />
+      <Label fx:id="lblStatus" layoutX="181.0" layoutY="24.0" text="..." />
+      <TextField fx:id="inputLogin" layoutX="153.0" layoutY="64.0" promptText="enter you login" />
+      <PasswordField fx:id="inputPassword" layoutX="153.0" layoutY="116.0" promptText="enter you password" />
+      <ComboBox fx:id="comboStudentAdmin" layoutX="37.0" layoutY="174.0" prefHeight="25.0" prefWidth="146.0" promptText="Admin/Client" />
+      <Button fx:id="btnLogin" layoutX="194.0" layoutY="174.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="116.0" text="Log in" />
+   </children>
+</AnchorPane>
