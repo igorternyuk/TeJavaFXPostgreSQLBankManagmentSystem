@@ -8,19 +8,13 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="600.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bankmanager.clients.ClientsController">
+<AnchorPane id="AnchorPane" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bankmanager.clients.ClientsController">
    <children>
       <VBox layoutX="131.0" layoutY="7.0" prefHeight="207.0" prefWidth="400.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
-            <HBox alignment="CENTER" prefHeight="400.0" prefWidth="400.0" spacing="10.0">
+            <HBox alignment="CENTER" prefHeight="300.0" prefWidth="350.0" spacing="10.0">
                <children>
-                  <TextArea fx:id="txtAreaClientInfo" prefHeight="400.0" prefWidth="396.0" />
-               </children>
-            </HBox>
-            <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
-               <children>
-                  <Label text="Status" />
-                  <TextField fx:id="txtClientTransactionStatus" promptText="Status" />
+                  <TextArea fx:id="txtAreaClientInfo" prefHeight="350.0" prefWidth="396.0" />
                </children>
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0">
@@ -37,9 +31,10 @@
             </HBox>
             <HBox alignment="CENTER" prefHeight="50.0" prefWidth="200.0" spacing="15.0">
                <children>
-                  <Button fx:id="btnDeposit" mnemonicParsing="false" text="Deposit" />
-                  <Button fx:id="btnWithdraw" mnemonicParsing="false" text="Withdraw" />
-                  <Button fx:id="btnClientWindowClose" mnemonicParsing="false" text="Exit" />
+                  <Button fx:id="btnLoadDetails" mnemonicParsing="false" onAction="#onBtnLoadDetailsClicked" text="Load details" />
+                  <Button fx:id="btnDeposit" mnemonicParsing="false" onAction="#onBtnDepositClicked" text="Deposit" />
+                  <Button fx:id="btnWithdraw" mnemonicParsing="false" onAction="#onBtnWithdrawClicked" text="Withdraw" />
+                  <Button fx:id="btnClientWindowClose" mnemonicParsing="false" onAction="#onBtnExit" text="Exit" />
                </children>
             </HBox>
          </children>

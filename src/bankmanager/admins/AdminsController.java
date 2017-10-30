@@ -1,14 +1,27 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package bankmanager.admins;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+import javafx.fxml.Initializable;
 
 /**
  *
  * @author igor
+ * Last edited 30-10-2017
  */
-public class AdminsController {
+public class AdminsController implements Initializable{
+    private int id;
+    
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     
 }

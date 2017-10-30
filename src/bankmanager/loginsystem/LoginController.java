@@ -22,6 +22,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -36,6 +37,9 @@ public class LoginController implements Initializable{
     
     private AdminDAO adminDAO = new AdminDAO();
     private ClientDAO clientDAO = new ClientDAO();
+    
+    @FXML
+    private TextArea txtAreaClientInfo;
 
     @FXML
     private Label lblStatus;
@@ -69,18 +73,19 @@ public class LoginController implements Initializable{
         String password = inputPassword.getText();
         LoginOption option = comboClientAdmin.getSelectionModel()
                 .getSelectedItem();
+        int id;
         switch(option){
             case admin:
-                if(adminDAO.checkIfAccountExists(login, password)){
-                    adminLogin();
+                if((id = adminDAO.checkIfAccountExists(login, password)) > 0){
+                    adminLogin(id);
                     closeWindow();
                 } else {
                     showWrongCredentialsErrorMessage();
                 }
                 break;
             case client:
-                if (clientDAO.checkIfClientExists(login, password)) {
-                    clientLogin();
+                if ((id = clientDAO.checkIfClientExists(login, password)) > 0) {
+                    clientLogin(id);
                     closeWindow();
                 } else {
                     showWrongCredentialsErrorMessage();
@@ -89,7 +94,7 @@ public class LoginController implements Initializable{
         }
     }
     
-    public void clientLogin() {
+    public void clientLogin(int id) {
         try { 
             URL resource = this.getClass().getClassLoader().getResource(
                      "bankmanager/clients/Clients.fxml");
@@ -97,12 +102,15 @@ public class LoginController implements Initializable{
             Pane root = (Pane)loader.load(resource.openStream());
             ClientsController controller = (ClientsController)loader
                     .getController();
+            controller.setId(id);
             Scene scene = new Scene(root);
             Stage clientStage = new Stage();
             clientStage.setScene(scene);
             clientStage.setTitle("Clients dashboard");
             clientStage.setResizable(false);
             clientStage.show();
+            controller.loadClientDetails();
+            controller.disableFieldEditing();
         } catch (IOException ex) {
             Logger.getLogger(LoginController.class.getName()).log(Level.SEVERE,
                                                                   null, ex);
@@ -110,7 +118,7 @@ public class LoginController implements Initializable{
         
     }
    
-    public void adminLogin() {
+    public void adminLogin(int id) {
         try {
             URL resource = this.getClass().getClassLoader().getResource(
                     "bankmanager/admins/Admins.fxml");
@@ -118,6 +126,7 @@ public class LoginController implements Initializable{
             Pane root = loader.load(resource.openStream());
             AdminsController controller = (AdminsController)loader
                     .getController();
+            controller.setId(id);
             Scene scene = new Scene(root);
             Stage adminStage = new Stage();
             adminStage.setScene(scene);

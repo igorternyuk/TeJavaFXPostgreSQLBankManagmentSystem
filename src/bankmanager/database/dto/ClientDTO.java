@@ -41,17 +41,17 @@ public class ClientDTO {
     }
 
     public ClientDTO(int id, String firstname, String surname, String dob,
-                     String gender, String address, String phone, String email,
-                     String account, double balance, String password) {
+                     Gender gender, String address, String phone, String email,
+                     AccountType account, double balance, String password) {
         this.id.set(id);
         this.firstname.set(firstname);
         this.surname.set(surname);
         this.dob.set(dob);
-        this.gender.set(gender);
+        this.gender.set(gender.toString());
         this.address.set(address);
         this.phone.set(phone);
         this.email.set(email);
-        this.account.set(account);
+        this.account.set(account.toString());
         this.balance.set(balance);
         this.password.set(password);
     }
@@ -89,8 +89,8 @@ public class ClientDTO {
         this.dob.set(dob);
     }
 
-    public String getGender() {
-        return gender.get();
+    public Gender getGender() {
+        return Gender.valueOf(gender.get());
     }
 
     public void setGender(String gender) {
@@ -121,8 +121,8 @@ public class ClientDTO {
         this.email.set(email);
     }
 
-    public String getAccount() {
-        return account.get();
+    public AccountType getAccount() {
+        return AccountType.valueOf(account.get());
     }
 
     public void setAccount(String account) {
@@ -211,4 +211,9 @@ public class ClientDTO {
                 ", email=" + email.get() + ", account=" + account.get() + ", balance=" + 
                 balance.get() + ", password=" + password.get() + '}';
     }
+    
+    /*public static void main(String[] args) {
+        Gender g = Gender.female;
+        System.out.println("gender = " + g);
+    }*/
 }

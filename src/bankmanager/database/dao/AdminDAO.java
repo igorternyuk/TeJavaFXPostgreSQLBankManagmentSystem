@@ -154,7 +154,7 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
         return admins;
     }
     
-    public boolean checkIfAccountExists(String email, String password){
+    public int checkIfAccountExists(String email, String password){
         PreparedStatement ps;
         ResultSet rs;
         try {
@@ -162,13 +162,17 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
             ps.setString(1, email);
             ps.setString(2, password);
             rs = ps.executeQuery();
-            return rs.next();
+            if(rs.next()){
+                AdminDTO admin = retrieveAdminFromResultSet(rs);
+                return admin.getId();
+            }
+            return -1;
         } catch (SQLException ex) {
             Logger.getLogger(AdminDAO.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             connector.closeConnection();
         }
-        return false;
+        return -1;
     }
      
     private AdminDTO retrieveAdminFromResultSet(ResultSet rs) throws SQLException{
