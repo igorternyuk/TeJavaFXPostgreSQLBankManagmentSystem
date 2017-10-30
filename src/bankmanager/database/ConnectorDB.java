@@ -26,11 +26,16 @@ public class ConnectorDB {
     private String username;
     private String password;
     private Connection connection;
+    
     public static synchronized ConnectorDB getInstance(){
         if(instance == null){
             instance = new ConnectorDB();
         }
         return instance;
+    }
+    
+    public static boolean isConnected(){
+        return instance != null;
     }
 
     private ConnectorDB() {
@@ -110,7 +115,7 @@ public class ConnectorDB {
         ConnectorDB.instance = null;
     }
     
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         try {
             Connection con = ConnectorDB.getInstance().getConnection();
             Statement st = con.createStatement();
@@ -127,32 +132,5 @@ public class ConnectorDB {
             Logger.getLogger(ConnectorDB.class.getName()).log(Level.SEVERE, 
                                                               null, ex);
         }
-    }
+    }*/
 }
-
-
-/*String url =  "jdbc:postgresql://localhost:5432/testPostgre";
-        String usuario = "igor";
-        String contraseña = "1319";
-        
-        try{
-            Class.forName("org.postgresql.Driver");
-            try (Connection con = DriverManager.getConnection(url, usuario, contraseña); 
-                 Statement st = con.createStatement()) {
-                String cmd = "SELECT * FROM clientes WHERE apellido LIKE '%Ma%' OR nombre LIKE '%J%';";
-                ResultSet rs = st.executeQuery(cmd);
-                while(rs.next()){
-                    String id = rs.getString("id");
-                    String nombre = rs.getString("nombre");
-                    String apellido = rs.getString("apellido");
-                    System.out.println("ID: " + id + " Nombre: " + nombre +
-                            " apellido: " + apellido);
-                }
-                
-                rs.close();
-            }
-            
-        }
-        catch(ClassNotFoundException | SQLException ex){
-            System.err.println("ERROR" + ex.getMessage());
-        }*/

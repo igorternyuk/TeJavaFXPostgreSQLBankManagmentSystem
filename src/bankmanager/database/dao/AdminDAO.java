@@ -29,6 +29,8 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
     private static final String SQL_READ_BY_ID = "SELECT * FROM admins WHERE id "
             + "= ?;";
     private static final String SQL_READ_ALL = "SELECT * FROM admins;";
+    private static final String SQL_CHECK_ACCOUNT = "SELECT * FROM admins WHERE"
+            + " email = ? AND pass = ?;";
 
     @Override
     public boolean insert(AdminDTO obj) {
@@ -151,6 +153,23 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
 
         return admins;
     }
+    
+    public boolean checkIfAccountExists(String email, String password){
+        PreparedStatement ps;
+        ResultSet rs;
+        try {
+            ps = connector.getConnection().prepareStatement(SQL_CHECK_ACCOUNT);
+            ps.setString(1, email);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException ex) {
+            Logger.getLogger(AdminDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            connector.closeConnection();
+        }
+        return false;
+    }
      
     private AdminDTO retrieveAdminFromResultSet(ResultSet rs) throws SQLException{
         AdminDTO admin = new AdminDTO(rs.getInt(1), rs.getString(2),
@@ -158,11 +177,19 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
         return admin;       
     }
     
+    
     /*public static void main(String[] args) {
         AdminDAO dao = new AdminDAO();
         //AdminDTO admin = new AdminDTO(5,"watain666@mail.ru", "333");
        // dao.insert(admin);
-        dao.delete(5);
+        //dao.delete(5);
+        boolean xmonad1319Exists = dao.checkIfAccountExists("x8monad@ukr.net",
+                                                              "1319");
+        if(xmonad1319Exists){
+            System.out.println("Account exists");
+        } else {
+            System.out.println("Account doesn't exist");
+        }
         List<AdminDTO> listado = dao.readAll();
         listado.forEach( e -> {
             System.out.println(e);

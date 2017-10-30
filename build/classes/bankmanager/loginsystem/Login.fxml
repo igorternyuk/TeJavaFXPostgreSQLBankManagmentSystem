@@ -14,7 +14,7 @@
       <Label fx:id="lblStatus" layoutX="181.0" layoutY="24.0" text="..." />
       <TextField fx:id="inputLogin" layoutX="153.0" layoutY="64.0" promptText="enter you login" />
       <PasswordField fx:id="inputPassword" layoutX="153.0" layoutY="116.0" promptText="enter you password" />
-      <ComboBox fx:id="comboStudentAdmin" layoutX="37.0" layoutY="174.0" prefHeight="25.0" prefWidth="146.0" promptText="Admin/Client" />
-      <Button fx:id="btnLogin" layoutX="194.0" layoutY="174.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="116.0" text="Log in" />
+      <ComboBox fx:id="comboClientAdmin" layoutX="37.0" layoutY="174.0" prefHeight="25.0" prefWidth="146.0" promptText="Admin/Client" />
+      <Button fx:id="btnLogin" layoutX="194.0" layoutY="174.0" mnemonicParsing="false" onAction="#login" prefHeight="25.0" prefWidth="116.0" text="Log in" />
    </children>
 </AnchorPane>

@@ -2,7 +2,6 @@ package bankmanager.database.dao;
 
 import bankmanager.database.ConnectorDB;
 import bankmanager.database.dto.ClientDTO;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -34,10 +33,12 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
     private static final ConnectorDB connector = ConnectorDB.getInstance();
     private static final String SQL_INSERT = "INSERT INTO clients(" +
             "id, firstname, surname, dob, gender, address, phone, email,"+ 
-            "account, balance, pass) VALUES(?,?,?,?,?::sex,?,?,?,?::account_type,?,?);";
+            "account, balance, pass) VALUES(?,?,?,?,?::sex,?,?,?,?::account_type,"
+            + "?,?);";
     private static final String SQL_UPDATE = "UPDATE clients SET firstname = ?,"
-            + "surname = ?, dob = ?::date, gender = ?::sex, address = ?, phone = ?,"
-            + "email = ?, account = ?::account_type, balance = ?, pass = ? WHERE id = ?;";
+            + "surname = ?, dob = ?::date, gender = ?::sex, address = ?,"
+            + " phone = ?, email = ?, account = ?::account_type, balance = ?,"
+            + " pass = ? WHERE id = ?;";
     private static final String SQL_DELETE = "DELETE FROM clients WHERE id = ?;";
     private static final String SQL_READ_BY_ID = "SELECT * FROM clients WHERE"
             + " id = ?;";
@@ -54,10 +55,6 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
             String target = obj.getDob();
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             java.util.Date date = df.parse(target);
-            System.out.println("date = " + date);
-            /*String target = "Thu Sep 28 20:29:30 JST 2000";
-            DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss zzz yyyy");
-            Date result =  df.parse(target);*/
             ps.setDate(4, new java.sql.Date(date.getTime()));
             ps.setString(5, obj.getGender());
             ps.setString(6, obj.getAddress());
@@ -138,7 +135,8 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
                 client = retrieveClientFromResulSet(rs);
             }            
         } catch (SQLException ex) {
-            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, null,
+                                                            ex);
         } finally {
             connector.closeConnection();
         }
@@ -173,6 +171,7 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
         List<ClientDTO> clients = new ArrayList<>();
         String cmd = "SELECT * FROM clients WHERE " + filter + " LIKE '%" +
                 regExp + "%';";
+        System.out.println("SQL = " + cmd);
         try {
             ps = connector.getConnection().prepareStatement(cmd);
             rs = ps.executeQuery();
@@ -188,7 +187,27 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
         return clients;
     }
     
-    private ClientDTO retrieveClientFromResulSet(ResultSet rs) throws SQLException{
+    public boolean checkIfClientExists(String email, String password){
+        PreparedStatement ps;
+        ResultSet rs;
+        String cmd = "SELECT * FROM clients WHERE email = ? AND pass = ?;";
+        try {
+            ps = connector.getConnection().prepareStatement(cmd);
+            ps.setString(1, email);
+            ps.setString(2, password);
+            rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException ex) {
+            Logger.getLogger(ClientDAO.class.getName()).log(Level.SEVERE, null,
+                                                            ex);
+        } finally {
+            connector.closeConnection();
+        }
+        return false;
+    }
+    
+    private ClientDTO retrieveClientFromResulSet(ResultSet rs) 
+            throws SQLException{
         int id = rs.getInt("id");
         String firstname = rs.getString("firstname");
         String surname = rs.getString("surname");
@@ -201,25 +220,25 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
         double balance = rs.getDouble("balance");
         String password = rs.getString("pass");
         ClientDTO client = new ClientDTO(id, firstname, surname, dob, gender,
-                                         address, phone, email, account, balance,
-                                         password);
+                                         address, phone, email, account,
+                                         balance, password);
         return client;        
     }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
         ClientDAO dao = new ClientDAO();
         //Alwara Höfels
         ClientDTO client = new ClientDTO(17, "Alwara ", "Höfels", "1982-03-06",
                                          "female", "Berlin", "+388797662941",
-                                         "superalwarahoeffels82@gmail.com", "premium",
-                                         750000000, "123");
+                                         "superalwarahoeffels82@gmail.com", 
+                                         "premium", 750000000, "123");
         
         //dao.insert(client);
-        dao.update(client);
+        //dao.update(client);
         //dao.delete(18);
-        List<ClientDTO> clients = dao.readAll();
+        List<ClientDTO> clients = dao.search("firstname", "a");
         clients.forEach( e -> {
             System.out.println(e);
         });
-    }
+    }*/
 }
