@@ -25,17 +25,17 @@ import javafx.beans.property.SimpleStringProperty;
 )
  */
 public class ClientDTO {
-    SimpleIntegerProperty id;
-    SimpleStringProperty firstname;
-    SimpleStringProperty surname;
-    SimpleStringProperty dob;
-    SimpleStringProperty gender; //Change to enum
-    SimpleStringProperty address;
-    SimpleStringProperty phone;
-    SimpleStringProperty email;
-    SimpleStringProperty account;//Change to enum
-    SimpleDoubleProperty balance;
-    SimpleStringProperty password;
+    private final SimpleIntegerProperty id = new SimpleIntegerProperty();
+    private final SimpleStringProperty firstname = new SimpleStringProperty();
+    private final SimpleStringProperty surname = new SimpleStringProperty();
+    private final SimpleStringProperty dob = new SimpleStringProperty();
+    private final SimpleStringProperty gender = new SimpleStringProperty(); //Change to enum
+    private final SimpleStringProperty address = new SimpleStringProperty();
+    private final SimpleStringProperty phone = new SimpleStringProperty();
+    private final SimpleStringProperty email = new SimpleStringProperty();
+    private final SimpleStringProperty account = new SimpleStringProperty();//Change to enum
+    private final SimpleDoubleProperty balance = new SimpleDoubleProperty();
+    private final SimpleStringProperty password = new SimpleStringProperty();
 
     public ClientDTO() {
     }
@@ -65,8 +65,8 @@ public class ClientDTO {
         this.id.set(id);
     }
 
-    public SimpleStringProperty getFirstname() {
-        return firstname;
+    public String getFirstname() {
+        return firstname.get();
     }
 
     public void setFirstname(String firstname) {
@@ -205,10 +205,10 @@ public class ClientDTO {
 
     @Override
     public String toString() {
-        return "ClientDTO{" + "id=" + id + ", firstname=" + firstname + 
-                ", surname=" + surname + ", dob=" + dob + ", gender=" + 
-                gender + ", address=" + address + ", phone=" + phone +
-                ", email=" + email + ", account=" + account + ", balance=" + 
-                balance + ", password=" + password + '}';
+        return "ClientDTO{" + "id=" + id.get() + ", firstname=" + firstname.get() + 
+                ", surname=" + surname.get() + ", dob=" + dob.get() + ", gender=" + 
+                gender.get() + ", address=" + address.get() + ", phone=" + phone.get() +
+                ", email=" + email.get() + ", account=" + account.get() + ", balance=" + 
+                balance.get() + ", password=" + password.get() + '}';
     }
 }

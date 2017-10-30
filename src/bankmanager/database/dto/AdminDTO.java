@@ -17,9 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 )
  */
 public class AdminDTO {
-    private SimpleIntegerProperty id;
-    private SimpleStringProperty email;
-    SimpleStringProperty password;
+    private final SimpleIntegerProperty id = new SimpleIntegerProperty();
+    private final SimpleStringProperty email = new SimpleStringProperty();
+    private final SimpleStringProperty password = new SimpleStringProperty();
 
     public AdminDTO() {
     }
