@@ -19,9 +19,13 @@ import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -32,20 +36,12 @@ import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.KeyEvent;
 
 /**
  *
  * @author igor
- * Last edited 30-10-2017
- * 1.Всем нужным елементам GUI присвоить ID
- * 2.Прописать обработчики событий для кнопок
- * 
- * 
-LocalDate localDate = datePicker.getValue();
-Instant instant = Instant.from(localDate.atStartOfDay(ZoneId.systemDefault()));
-Date date = Date.from(instant);
-System.out.println(localDate + "\n" + instant + "\n" + date);
+ * Last edited 31-10-2017
  */
 
 public class AdminsController implements Initializable{
@@ -54,6 +50,9 @@ public class AdminsController implements Initializable{
     private ObservableList<AdminDTO> adminsData;
     private ClientDAO daoClient = new ClientDAO();
     private ObservableList<ClientDTO> clientsData;
+    //private XYChart.Series clientBalanceSeries = new XYChart.Series();
+    private ObservableList<XYChart.Data> barChartData =
+            FXCollections.observableArrayList();
     //Admins
     @FXML
     private TextField inputAminID;
@@ -199,6 +198,12 @@ public class AdminsController implements Initializable{
     private BarChart barChart;
     
     @FXML
+    private CategoryAxis xAxis;
+    
+    @FXML
+    private NumberAxis yAxis;
+    
+    @FXML
     public void onBtnInsertAdminClicked(ActionEvent e){
         Alert alert;
         if(isAdminsFormFilled()){
@@ -326,6 +331,7 @@ public class AdminsController implements Initializable{
                                       + "was successfully inserted to the "
                                       + "database", ButtonType.OK);
                     loadClientsFullList();
+                    loadBarChartData();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Insertion failed",
                                       ButtonType.OK);
@@ -351,6 +357,7 @@ public class AdminsController implements Initializable{
                                      "Client's data was successfully updated",
                                       ButtonType.OK);
                     loadClientsFullList();
+                    loadBarChartData();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Update failed",
                                       ButtonType.OK);
@@ -380,10 +387,11 @@ public class AdminsController implements Initializable{
                 if(daoClient.delete(idToDelete)){
                     alert = new Alert(Alert.AlertType.INFORMATION, "Client with"
                                       + " id = " + String.valueOf(idToDelete)
-                                      + " was successfullu deleted from the "
+                                      + " was successfully deleted from the "
                                       + "database", ButtonType.OK);
                     alert.showAndWait();
                     loadClientsFullList();
+                    loadBarChartData();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Could not delete"
                                       + " client with such id", ButtonType.OK);
@@ -400,6 +408,7 @@ public class AdminsController implements Initializable{
     @FXML
     public void onBtnReloadClientsTable(ActionEvent e){
         loadClientsFullList();
+        loadBarChartData();
     }
     
     @FXML
@@ -437,7 +446,8 @@ public class AdminsController implements Initializable{
     public void initialize(URL location, ResourceBundle resources) {
         
         //======================Admins==========================
-        
+        this.inputAminID.addEventFilter(KeyEvent.KEY_TYPED,
+                                        integer_validator(Integer.MAX_VALUE));
         this.colAdminsID.setCellValueFactory(
                 new PropertyValueFactory<>("id"));
         this.colAdminsEmail.setCellValueFactory(
@@ -461,6 +471,11 @@ public class AdminsController implements Initializable{
         } );        
         
         //=====================Clients=============================
+        this.inputClientsID.addEventFilter(KeyEvent.KEY_TYPED,
+                                           integer_validator(Integer.MAX_VALUE));
+        this.inputClientsBalance.addEventFilter(KeyEvent.KEY_TYPED,
+                                                double_validator(
+                                                     Double.MAX_VALUE));
         this.colClientsID.setCellValueFactory(
                 new PropertyValueFactory<>("id"));
         this.colClientsName.setCellValueFactory(
@@ -507,6 +522,12 @@ public class AdminsController implements Initializable{
             });
             return row;
         } );
+        
+        //=======================Chart============================
+        this.xAxis.setLabel("Clients");
+        this.yAxis.setLabel("Balance");    
+        this.barChart.setData(barChartData);
+        //this.clientBalanceSeries.setName("Balances");
     }
     
     private ClientDTO readDataFromClientsForm(){
@@ -642,6 +663,17 @@ public class AdminsController implements Initializable{
         this.tableAdmins.setItems(null);
         this.tableAdmins.setItems(this.adminsData);
     }
+    
+    private void loadBarChartData(){        
+        barChart.getData().clear();
+        XYChart.Series clientBalanceSeries = new XYChart.Series();
+        List<ClientDTO> clients = this.daoClient.readAll();
+        clients.forEach((client) -> {
+            clientBalanceSeries.getData().add(new XYChart.Data(
+                    client.getSurname(), client.getBalance()));
+        });        
+        barChart.getData().add(clientBalanceSeries);
+    }
 
     public int getLoggedInAdminID() {
         return loggedInAdminID;
@@ -649,5 +681,37 @@ public class AdminsController implements Initializable{
 
     public void setLoggedInAdminID(int loggedInAdminID) {
         this.loggedInAdminID = loggedInAdminID;
-    }    
+    }  
+    
+    private EventHandler<KeyEvent> integer_validator(final Integer max_Lengh) {
+        return (KeyEvent e) -> {
+            TextField txt_TextField = (TextField) e.getSource();
+            if (txt_TextField.getText().length() >= max_Lengh) {
+                e.consume();
+            }                    
+            if(!e.getCharacter().matches("[0-9]")){
+                e.consume();
+            }
+        };
+    }
+    
+    private EventHandler<KeyEvent> double_validator(final Double max_Lengh) {
+        return (KeyEvent e) -> {
+            TextField txt_TextField = (TextField) e.getSource();
+            if (txt_TextField.getText().length() >= max_Lengh) {
+                e.consume();
+            }                    
+            if(e.getCharacter().matches("[0-9.]")){
+                if(txt_TextField.getText().contains(".") &&
+                   e.getCharacter().matches("[.]")){
+                    e.consume();
+                }else if(txt_TextField.getText().length() == 0 &&
+                         e.getCharacter().matches("[.]")){
+                    e.consume();
+                }
+            }else{
+                e.consume();
+            }
+        };
+    }
 }

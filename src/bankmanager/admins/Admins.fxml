@@ -159,12 +159,12 @@
                                           <TableColumn fx:id="colClientsPassword" prefWidth="91.0" text="Password" />
                                       </columns>
                                     </TableView>
-                                    <BarChart fx:id="barChart" prefHeight="360.0" prefWidth="900.0" title="Bar chart">
+                                    <BarChart fx:id="barChart" prefHeight="360.0" prefWidth="900.0" title="Money chart">
                                       <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
+                                        <CategoryAxis fx:id="xAxis" side="BOTTOM" />
                                       </xAxis>
                                       <yAxis>
-                                        <NumberAxis side="LEFT" />
+                                        <NumberAxis fx:id="yAxis" side="LEFT" />
                                       </yAxis>
                                     </BarChart>
                                  </children>
