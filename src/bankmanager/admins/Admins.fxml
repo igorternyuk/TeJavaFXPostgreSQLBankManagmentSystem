@@ -102,39 +102,39 @@
                            <children>
                               <VBox prefHeight="200.0" prefWidth="300.0" spacing="10.0">
                                  <children>
-                                    <TextField promptText="ID">
+                                    <TextField fx:id="inputClientsID" promptText="ID">
                                        <VBox.margin>
                                           <Insets top="10.0" />
                                        </VBox.margin>
                                     </TextField>
-                                    <TextField promptText="First name" />
-                                    <TextField promptText="Surname" />
+                                    <TextField fx:id="inputClientsFirstname" promptText="First name" />
+                                    <TextField fx:id="inputClientsSurname" promptText="Surname" />
                                     <DatePicker fx:id="dobClient" prefHeight="25.0" prefWidth="295.0" promptText="Date of birth" />
                                     <ComboBox fx:id="comboGender" prefHeight="25.0" prefWidth="299.0" promptText="Gender" />
-                                    <TextField promptText="Address" />
-                                    <TextField promptText="Phone" />
-                                    <TextField promptText="E-mail" />
+                                    <TextField fx:id="inputClientsAddress" promptText="Address" />
+                                    <TextField fx:id="inputClientsPhone" promptText="Phone" />
+                                    <TextField fx:id="inputClientsEmail" promptText="E-mail" />
                                     <ComboBox fx:id="comboAccount" prefHeight="25.0" prefWidth="296.0" promptText="Account type" />
-                                    <TextField promptText="Balance" />
-                                    <TextField promptText="Password" />
+                                    <TextField fx:id="inputClientsBalance" promptText="Balance" />
+                                    <TextField fx:id="inputClientsPassword" promptText="Password" />
                                     <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <Button fx:id="btnClientsInsert" mnemonicParsing="false" prefHeight="25.0" prefWidth="64.0" text="Insert" />
-                                          <Button fx:id="btnClientsUpdate" mnemonicParsing="false" text="Update" />
-                                          <Button fx:id="btnClientsDelete" mnemonicParsing="false" text="Delete" />
-                                          <Button fx:id="btnClientsClearForm" mnemonicParsing="false" text="Clear" />
+                                          <Button fx:id="btnClientsInsert" mnemonicParsing="false" onAction="#onBtnInsertClientClicked" prefHeight="25.0" prefWidth="64.0" text="Insert" />
+                                          <Button fx:id="btnClientsUpdate" mnemonicParsing="false" onAction="#onBtnUpdateClientClicked" text="Update" />
+                                          <Button fx:id="btnClientsDelete" mnemonicParsing="false" onAction="#onBtnDeleteClientClicked" text="Delete" />
+                                          <Button fx:id="btnClientsClearForm" mnemonicParsing="false" onAction="#onBtnClearClientsFormClicked" text="Clear" />
                                        </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <TextField prefHeight="25.0" prefWidth="204.0" />
-                                          <Button mnemonicParsing="false" text="Search" />
+                                          <TextField fx:id="inputClientsSearchField" prefHeight="25.0" prefWidth="204.0" />
+                                          <Button fx:id="btnSearchClient" mnemonicParsing="false" onAction="#onBtnSearchForClientClicked" text="Search" />
                                        </children>
                                     </HBox>
                                     <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
                                        <children>
-                                          <ComboBox prefHeight="25.0" prefWidth="206.0" promptText="Search filter" />
-                                          <Button mnemonicParsing="false" text="Full list" />
+                                          <ComboBox fx:id="comboClientSearch" prefHeight="25.0" prefWidth="206.0" promptText="Search filter" />
+                                          <Button fx:id="btnLoadClientsList" mnemonicParsing="false" onAction="#onBtnReloadClientsTable" text="FullList" />
                                        </children>
                                     </HBox>
                                  </children>
@@ -159,7 +159,7 @@
                                           <TableColumn fx:id="colClientsPassword" prefWidth="91.0" text="Password" />
                                       </columns>
                                     </TableView>
-                                    <BarChart prefHeight="360.0" prefWidth="900.0" title="Bar chart">
+                                    <BarChart fx:id="barChart" prefHeight="360.0" prefWidth="900.0" title="Bar chart">
                                       <xAxis>
                                         <CategoryAxis side="BOTTOM" />
                                       </xAxis>

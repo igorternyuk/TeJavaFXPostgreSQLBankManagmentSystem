@@ -2,10 +2,18 @@ package bankmanager.admins;
 
 import bankmanager.database.dao.AdminSearchType;
 import bankmanager.database.dao.AdminDAO;
+import bankmanager.database.dao.ClientDAO;
+import bankmanager.database.dao.ClientSearchType;
 import bankmanager.database.dto.AccountType;
 import bankmanager.database.dto.AdminDTO;
+import bankmanager.database.dto.ClientDTO;
 import bankmanager.database.dto.Gender;
 import java.net.URL;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.ResourceBundle;
 import javafx.collections.FXCollections;
@@ -13,6 +21,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.BarChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -32,8 +41,7 @@ import javafx.scene.input.MouseEvent;
  * 1.Всем нужным елементам GUI присвоить ID
  * 2.Прописать обработчики событий для кнопок
  * 
- * this.comboClientAdmin.setItems(
-FXCollections.observableArrayList(LoginOption.values()));
+ * 
 LocalDate localDate = datePicker.getValue();
 Instant instant = Instant.from(localDate.atStartOfDay(ZoneId.systemDefault()));
 Date date = Date.from(instant);
@@ -42,9 +50,10 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
 
 public class AdminsController implements Initializable{
     private int loggedInAdminID;
-    private AdminDAO dao = new AdminDAO();
-    private ObservableList<AdminDTO> data;
-    
+    private AdminDAO daoAdmin = new AdminDAO();
+    private ObservableList<AdminDTO> adminsData;
+    private ClientDAO daoClient = new ClientDAO();
+    private ObservableList<ClientDTO> clientsData;
     //Admins
     @FXML
     private TextField inputAminID;
@@ -91,16 +100,114 @@ public class AdminsController implements Initializable{
     @FXML
     private TableColumn<AdminDTO, String> colAdminsPasswword;
     
+    //======================Clients==========================
+    
+    @FXML
+    private TextField inputClientsID;
+    
+    @FXML
+    private TextField inputClientsFirstname;
+    
+    @FXML
+    private TextField inputClientsSurname;
+    
+    @FXML
+    private DatePicker dobClient;
+    
+    @FXML
+    private ComboBox<Gender> comboGender;
+    
+    @FXML
+    private TextField inputClientsAddress;
+    
+    @FXML
+    private TextField inputClientsPhone;
+    
+    @FXML
+    private TextField inputClientsEmail;
+    
+    @FXML
+    private ComboBox<AccountType> comboAccount;
+    
+    @FXML
+    private TextField inputClientsBalance;
+    
+    @FXML
+    private TextField inputClientsPassword;
+    
+    @FXML
+    private Button btnClientsInsert;
+    
+    @FXML
+    private Button btnClientsUpdate;
+    
+    @FXML
+    private Button btnClientsDelete;
+    
+    @FXML
+    private Button btnClientsClearForm;
+    
+    @FXML
+    private TextField inputClientsSearchField;
+    
+    @FXML
+    private Button btnSearchClient;
+    
+    @FXML
+    private ComboBox<ClientSearchType> comboClientSearch;
+    
+    @FXML
+    private Button btnLoadClientsList;
+    
+    @FXML
+    private TableColumn<ClientDTO, Integer> colClientsID;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsName;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsSurname;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsDOB;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsGender;
+        
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsAddress;
+            
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsPhone;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsEmail;
+    
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsAccount;
+        
+    @FXML
+    private TableColumn<ClientDTO, Double> colClientsBalance;
+            
+    @FXML
+    private TableColumn<ClientDTO, String> colClientsPassword;
+    
+    @FXML
+    private TableView<ClientDTO> tableClients;
+    
+    @FXML
+    private BarChart barChart;
+    
     @FXML
     public void onBtnInsertAdminClicked(ActionEvent e){
         Alert alert;
         if(isAdminsFormFilled()){
             if(isEmailFieldCorrect(this.inputAdminEmail.getText())){
-                if(dao.insert(readDataFromAdminsForm())){
+                if(daoAdmin.insert(readDataFromAdminsForm())){
                     alert = new Alert(Alert.AlertType.INFORMATION, "New admin "
                                       + "was successfully inserted to the "
                                       + "database", ButtonType.OK);
-                    loadFullList();
+                    loadAdminsFullList();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Insertion failed",
                                       ButtonType.OK);
@@ -121,11 +228,11 @@ public class AdminsController implements Initializable{
         Alert alert;
         if(isAdminsFormFilled()){
             if(isEmailFieldCorrect(this.inputAdminEmail.getText())){
-                if(dao.update(readDataFromAdminsForm())){
-                    alert = new Alert(Alert.AlertType.INFORMATION, "Admin's data"
-                                      + " was successfully updated",
+                if(daoAdmin.update(readDataFromAdminsForm())){
+                    alert = new Alert(Alert.AlertType.INFORMATION,
+                                     "Admin's data was successfully updated",
                                       ButtonType.OK);
-                    loadFullList();
+                    loadAdminsFullList();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Update failed",
                                       ButtonType.OK);
@@ -152,13 +259,14 @@ public class AdminsController implements Initializable{
             confirmDialog.showAndWait();
             if(confirmDialog.getResult() == ButtonType.YES){
                 int idToDelete = Integer.valueOf(this.inputAminID.getText());
-                if(dao.delete(idToDelete)){
-                    alert = new Alert(Alert.AlertType.INFORMATION, "Register with"
-                                            + " id = " + String.valueOf(idToDelete)
-                                            + " was successfullu deleted from the "
-                                            + "database", ButtonType.OK);
+                if(daoAdmin.delete(idToDelete)){
+                    alert = new Alert(Alert.AlertType.INFORMATION,
+                                     "Register with id = " + 
+                                     String.valueOf(idToDelete)
+                                     + " was successfullu deleted from the "
+                                     + "database", ButtonType.OK);
                     alert.showAndWait();
-                    loadFullList();
+                    loadAdminsFullList();
                 } else {
                     alert = new Alert(Alert.AlertType.ERROR, "Could not delete"
                                       + " register with such id", ButtonType.OK);
@@ -174,7 +282,7 @@ public class AdminsController implements Initializable{
         
     @FXML
     public void onBtnReloadAdminTable(ActionEvent e){
-        loadFullList();
+        loadAdminsFullList();
     }
     
     @FXML
@@ -187,97 +295,159 @@ public class AdminsController implements Initializable{
         AdminSearchType filter = this.comboAdminSearch.getSelectionModel()
                                  .getSelectedItem();
         String regExp = this.inputAdminSearchField.getText();
-        List<AdminDTO> searchResults = this.dao.search(filter, regExp);
+        List<AdminDTO> searchResults = this.daoAdmin.search(filter, regExp);
         Alert alert;
         switch(searchResults.size()){
             case 0:
-                alert = new Alert(Alert.AlertType.WARNING, "No registers found",
+                alert = new Alert(Alert.AlertType.WARNING, "No admins found",
                                   ButtonType.OK);
                 break;
             case 1:
-                alert = new Alert(Alert.AlertType.INFORMATION, "One register was"
+                alert = new Alert(Alert.AlertType.INFORMATION, "One admin was"
                                   + " found", ButtonType.OK);
                 break;
             default:
-                alert = new Alert(Alert.AlertType.INFORMATION, searchResults.size()
-                                  + " registers were found", ButtonType.OK);
+                alert = new Alert(Alert.AlertType.INFORMATION,
+                                  searchResults.size()
+                                  + " admins were found", ButtonType.OK);
                 break;
         }
-        loadList(searchResults);
+        loadAdminsList(searchResults);
+        alert.showAndWait();        
+    }
+    
+    @FXML
+    public void onBtnInsertClientClicked(ActionEvent event){
+        Alert alert;
+        if(isClientsFormFilled()){
+            if(isEmailFieldCorrect(this.inputClientsEmail.getText())){
+                if(daoClient.insert(readDataFromClientsForm())){
+                    alert = new Alert(Alert.AlertType.INFORMATION, "New client "
+                                      + "was successfully inserted to the "
+                                      + "database", ButtonType.OK);
+                    loadClientsFullList();
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR, "Insertion failed",
+                                      ButtonType.OK);
+                }
+            } else {
+                alert = new Alert(Alert.AlertType.ERROR, "Incorrect E-mail "
+                                 + "format", ButtonType.OK);                
+            }
+        } else {
+            alert = new Alert(Alert.AlertType.ERROR, "You must fill the from"
+                              + " before insertion", ButtonType.OK);
+        }        
         alert.showAndWait();
-        
-    }
-  /*Person person = taview.getSelectionModel().getSelectedItem();
-System.out.println(person.getName());   */
-        
-        
-        /*
-        tableview.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-    @Override
-    public void changed(ObservableValue observableValue, Object oldValue, Object newValue) {
-        //Check whether item is selected and set value of selected item to Label
-        if(tableview.getSelectionModel().getSelectedItem() != null) 
-        {    
-           TableViewSelectionModel selectionModel = tableview.getSelectionModel();
-           ObservableList selectedCells = selectionModel.getSelectedCells();
-           TablePosition tablePosition = (TablePosition) selectedCells.get(0);
-           Object val = tablePosition.getTableColumn().getCellData(newValue);
-           System.out.println("Selected Value" + val);
-         }
-         }
-     });
-        
-     ///Set date picker value
-        
-        public static final LocalDate LOCAL_DATE (String dateString){
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-    LocalDate localDate = LocalDate.parse(dateString, formatter);
-    return localDate;
-}
-
-try {
-        datePicker.setValue(LOCAL_DATE("2016-05-01");
-    } catch (NullPointerException e) {
-    }
-        
-        //Get Value from date picker
-        
-        LocalDate localDate = datePicker.getValue();
-Instant instant = Instant.from(localDate.atStartOfDay(ZoneId.systemDefault()));
-Date date = Date.from(instant);
-System.out.println(localDate + "\n" + instant + "\n" + date);
-
-        */
-    @FXML
-    public void onAdminsTableClicked(MouseEvent e){
-        
-        //System.out.println("Mouse click event");
     }
     
-    //Clients
+    @FXML
+    public void onBtnUpdateClientClicked(ActionEvent event){
+        Alert alert;
+        if(isClientsFormFilled()){
+            if(isEmailFieldCorrect(this.inputClientsEmail.getText())){
+                if(daoClient.update(readDataFromClientsForm())){
+                    alert = new Alert(Alert.AlertType.INFORMATION,
+                                     "Client's data was successfully updated",
+                                      ButtonType.OK);
+                    loadClientsFullList();
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR, "Update failed",
+                                      ButtonType.OK);
+                }
+            } else {
+                alert = new Alert(Alert.AlertType.ERROR, "Incorrect E-mail"
+                                  + " format", ButtonType.OK);                
+            }
+        } else {
+            alert = new Alert(Alert.AlertType.ERROR, "You must fill the from"
+                              + " before insertion", ButtonType.OK);
+        }        
+        alert.showAndWait();
+    }
     
     @FXML
-    private DatePicker datepicker;
-
+    public void onBtnDeleteClientClicked(ActionEvent event){
+        Alert alert;
+        if(!this.inputClientsID.getText().isEmpty()){
+            Alert confirmDialog = new Alert(Alert.AlertType.CONFIRMATION,
+                                            "Do you really want to delete "
+                                            + "selected rigister?",
+                                            ButtonType.YES, ButtonType.NO);
+            confirmDialog.showAndWait();
+            if(confirmDialog.getResult() == ButtonType.YES){
+                int idToDelete = Integer.valueOf(this.inputClientsID.getText());
+                if(daoClient.delete(idToDelete)){
+                    alert = new Alert(Alert.AlertType.INFORMATION, "Client with"
+                                      + " id = " + String.valueOf(idToDelete)
+                                      + " was successfullu deleted from the "
+                                      + "database", ButtonType.OK);
+                    alert.showAndWait();
+                    loadClientsFullList();
+                } else {
+                    alert = new Alert(Alert.AlertType.ERROR, "Could not delete"
+                                      + " client with such id", ButtonType.OK);
+                    alert.showAndWait();
+                }
+            }
+        } else {
+            alert = new Alert(Alert.AlertType.ERROR, "You must fill the "
+                              + "from before insertion", ButtonType.OK);
+            alert.showAndWait();            
+        } 
+    }
     
     @FXML
-    private ComboBox<Gender> comboGender;
+    public void onBtnReloadClientsTable(ActionEvent e){
+        loadClientsFullList();
+    }
     
     @FXML
-    private ComboBox<AccountType> comboAccount;
+    public void onBtnClearClientsFormClicked(ActionEvent event){
+        clearClientsForm();
+    }
     
+    @FXML
+    public void onBtnSearchForClientClicked(ActionEvent event){
+        ClientSearchType filter = this.comboClientSearch.getSelectionModel()
+                                 .getSelectedItem();
+        String regExp = this.inputClientsSearchField.getText();
+        List<ClientDTO> searchResults = this.daoClient.search(filter, regExp);
+        Alert alert;
+        switch(searchResults.size()){
+            case 0:
+                alert = new Alert(Alert.AlertType.WARNING, "No clients found",
+                                  ButtonType.OK);
+                break;
+            case 1:
+                alert = new Alert(Alert.AlertType.INFORMATION, "One client was"
+                                  + " found", ButtonType.OK);
+                break;
+            default:
+                alert = new Alert(Alert.AlertType.INFORMATION,
+                                  searchResults.size()
+                                  + " clients were found", ButtonType.OK);
+                break;
+        }
+        loadClientsList(searchResults);
+        alert.showAndWait();
+    }
+  
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         
         //======================Admins==========================
         
-        this.colAdminsID.setCellValueFactory(new PropertyValueFactory<>("id"));
-        this.colAdminsEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        this.colAdminsPasswword.setCellValueFactory(new PropertyValueFactory<>("password"));
+        this.colAdminsID.setCellValueFactory(
+                new PropertyValueFactory<>("id"));
+        this.colAdminsEmail.setCellValueFactory(
+                new PropertyValueFactory<>("email"));
+        this.colAdminsPasswword.setCellValueFactory(
+                new PropertyValueFactory<>("password"));
         
         this.comboAdminSearch.setItems(
                 FXCollections.observableArrayList(AdminSearchType.values()));
-        this.comboAdminSearch.getSelectionModel().selectFirst();
+        this.comboAdminSearch.getSelectionModel().select(AdminSearchType.email);
         this.tableAdmins.setRowFactory( tv -> {
             TableRow<AdminDTO> row = new TableRow<>();
             row.setOnMouseClicked(event -> {
@@ -291,6 +461,28 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
         } );        
         
         //=====================Clients=============================
+        this.colClientsID.setCellValueFactory(
+                new PropertyValueFactory<>("id"));
+        this.colClientsName.setCellValueFactory(
+                new PropertyValueFactory<>("firstname"));
+        this.colClientsSurname.setCellValueFactory(
+                new PropertyValueFactory<>("surname"));
+        this.colClientsDOB.setCellValueFactory(
+                new PropertyValueFactory<>("dob"));
+        this.colClientsGender.setCellValueFactory(
+                new PropertyValueFactory<>("gender"));
+        this.colClientsAddress.setCellValueFactory(
+                new PropertyValueFactory<>("address"));
+        this.colClientsPhone.setCellValueFactory(
+                new PropertyValueFactory<>("phone"));
+        this.colClientsEmail.setCellValueFactory(
+                new PropertyValueFactory<>("email"));
+        this.colClientsAccount.setCellValueFactory(
+                new PropertyValueFactory<>("account"));
+        this.colClientsBalance.setCellValueFactory(
+                new PropertyValueFactory<>("balance"));
+        this.colClientsPassword.setCellValueFactory(
+                new PropertyValueFactory<>("password"));
         
         this.comboGender.setItems(
                 FXCollections.observableArrayList(Gender.values()));
@@ -298,6 +490,92 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
         this.comboAccount.setItems(
                 FXCollections.observableArrayList(AccountType.values()));
         this.comboAccount.getSelectionModel().selectFirst();
+        this.comboClientSearch.setItems(
+                FXCollections.observableArrayList(ClientSearchType.values())
+        );
+        this.comboClientSearch.getSelectionModel().select(
+                ClientSearchType.surname);
+        
+        this.tableClients.setRowFactory( tv -> {
+            TableRow<ClientDTO> row = new TableRow<>();
+            row.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 2 && (! row.isEmpty()) ) {
+                ClientDTO rowData = row.getItem();
+                fillClientsFormFromData(rowData);
+                System.out.println(rowData);
+            }
+            });
+            return row;
+        } );
+    }
+    
+    private ClientDTO readDataFromClientsForm(){
+        int ID = Integer.valueOf(this.inputClientsID.getText());
+        String firstname = this.inputClientsFirstname.getText();
+        String lastname = this.inputClientsSurname.getText();
+        LocalDate localDate = this.dobClient.getValue();
+        Instant instant = Instant.from(localDate.atStartOfDay(
+                ZoneId.systemDefault()));
+        Date date = Date.from(instant);
+        System.out.println("Date = " + date);
+        java.sql.Date sqlDate = new java.sql.Date(date.getTime());
+        String dob = sqlDate.toString();
+        Gender gender = comboGender.getSelectionModel().getSelectedItem();
+        String address = this.inputClientsAddress.getText();
+        String phone = this.inputClientsPhone.getText();
+        String email = this.inputClientsEmail.getText();
+        AccountType account = this.comboAccount.getSelectionModel()
+                             .getSelectedItem();
+        double balance = Double.valueOf(this.inputClientsBalance.getText());
+        String pass = this.inputClientsPassword.getText();
+        ClientDTO client = new ClientDTO(ID, firstname, lastname, dob,
+                                         gender, address, phone, email,
+                                         account, balance, pass);
+        return client;
+    }
+    
+    private void fillClientsFormFromData(ClientDTO client){
+        this.inputClientsID.setText(String.valueOf(client.getId()));
+        this.inputClientsFirstname.setText(client.getFirstname());
+        this.inputClientsSurname.setText(client.getSurname());
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate localDate = LocalDate.parse(client.getDob(), formatter);
+        this.dobClient.setValue(localDate);
+        this.comboGender.getSelectionModel().select(client.getGender());
+        this.inputClientsAddress.setText(client.getAddress());
+        this.inputClientsPhone.setText(client.getPhone());
+        this.inputClientsEmail.setText(client.getEmail());
+        this.comboAccount.getSelectionModel().select(client.getAccount());
+        this.inputClientsBalance.setText(String.valueOf(client.getBalance()));
+        this.inputClientsPassword.setText(client.getPassword());
+    }
+    
+    private void clearClientsForm(){
+        this.inputClientsID.setText("");
+        this.inputClientsFirstname.setText("");
+        this.inputClientsSurname.setText("");
+        this.dobClient.setValue(LocalDate.now());
+        this.comboGender.getSelectionModel().selectFirst();
+        this.inputClientsAddress.setText("");
+        this.inputClientsPhone.setText("");
+        this.inputClientsEmail.setText("");
+        this.comboAccount.getSelectionModel().selectFirst();
+        this.inputClientsBalance.setText("");
+        this.inputClientsPassword.setText("");
+        this.inputClientsSearchField.setText("");
+        loadClientsFullList();
+        this.tableClients.getSelectionModel().clearSelection();        
+    }
+    
+    private boolean isClientsFormFilled(){
+        return !this.inputClientsID.getText().isEmpty() &&
+               !this.inputClientsFirstname.getText().isEmpty() &&
+               !this.inputClientsSurname.getText().isEmpty() &&
+               !this.inputClientsAddress.getText().isEmpty() &&
+               !this.inputClientsPhone.getText().isEmpty() &&
+               !this.inputClientsEmail.getText().isEmpty() &&
+               !this.inputClientsBalance.getText().isEmpty() &&
+               !this.inputClientsPassword.getText().isEmpty();
     }
     
     private AdminDTO readDataFromAdminsForm(){
@@ -318,6 +596,9 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
         this.inputAminID.setText("");
         this.inputAdminEmail.setText("");
         this.inputAdminPassword.setText("");
+        this.inputAdminSearchField.setText("");
+        loadAdminsFullList();
+        this.tableAdmins.getSelectionModel().clearSelection();
     }
     
     private boolean isAdminsFormFilled(){
@@ -327,7 +608,6 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
     }
     
     private boolean isEmailFieldCorrect(String email){
-        //String email = this.inputAdminEmail.getText();
         int numOfAtSigns = 0;
         for(int i = 0; i < email.length(); ++i){
             if(email.charAt(i) == '@'){
@@ -337,16 +617,30 @@ System.out.println(localDate + "\n" + instant + "\n" + date);
         return numOfAtSigns == 1;
     }
     
-    private void loadFullList(){
-        this.data = FXCollections.observableArrayList(this.dao.readAll());        
-        this.tableAdmins.setItems(null);
-        this.tableAdmins.setItems(this.data);
+    private void loadClientsFullList(){
+        this.clientsData = FXCollections.observableArrayList(this.daoClient
+                .readAll());
+        this.tableClients.setItems(null);
+        this.tableClients.setItems(clientsData);
     }
     
-    private void loadList(List<AdminDTO> list){
-        this.data = FXCollections.observableArrayList(list);        
+    private void loadClientsList(List<ClientDTO> list){
+        this.clientsData = FXCollections.observableArrayList(list);
+        this.tableClients.setItems(null);
+        this.tableClients.setItems(this.clientsData);
+    }
+    
+    private void loadAdminsFullList(){
+        this.adminsData = FXCollections.observableArrayList(this.daoAdmin
+                .readAll());        
         this.tableAdmins.setItems(null);
-        this.tableAdmins.setItems(this.data);
+        this.tableAdmins.setItems(this.adminsData);
+    }
+    
+    private void loadAdminsList(List<AdminDTO> list){
+        this.adminsData = FXCollections.observableArrayList(list);        
+        this.tableAdmins.setItems(null);
+        this.tableAdmins.setItems(this.adminsData);
     }
 
     public int getLoggedInAdminID() {

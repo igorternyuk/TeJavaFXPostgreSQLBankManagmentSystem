@@ -161,8 +161,14 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
         PreparedStatement ps;
         ResultSet rs;
         List<ClientDTO> clients = new ArrayList<>();
-        String cmd = "SELECT * FROM clients WHERE " + filter.toString() + 
-                     " LIKE '%" + regExp + "%';";
+        String cmd;
+        if(filter == ClientSearchType.gender){
+            cmd = "SELECT * FROM clients WHERE " + filter.toString() + 
+                     "::character varying = '" + regExp + "';";
+        } else {
+            cmd = "SELECT * FROM clients WHERE " + filter.toString() + 
+                     "::character varying LIKE '%" + regExp + "%';";
+        }
         System.out.println("SQL = " + cmd);
         try {
             ps = connector.getConnection().prepareStatement(cmd);
