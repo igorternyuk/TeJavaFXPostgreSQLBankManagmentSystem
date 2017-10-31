@@ -132,14 +132,14 @@ public class AdminDAO implements ObligationDAO<AdminDTO>{
         return admins;
     }
 
-    @Override
-    public List<AdminDTO> search(String filter, String regExp) {
+    public List<AdminDTO> search(AdminSearchType filter, String regExp) {
         PreparedStatement ps;
         ResultSet rs;
         List<AdminDTO> admins = new ArrayList<>();
         try {
-            String cmd = "SELECT * FROM admins WHERE " + filter + " LIKE '%" + 
-                         regExp + "%';";
+            String cmd = "SELECT * FROM admins WHERE " + filter.getValue() +
+                         "::character varying LIKE '%" + regExp + "%';";
+            System.out.println("SQL_SEARCH = " + cmd);
             ps = connector.getConnection().prepareStatement(cmd);
             rs = ps.executeQuery();
             while(rs.next()){

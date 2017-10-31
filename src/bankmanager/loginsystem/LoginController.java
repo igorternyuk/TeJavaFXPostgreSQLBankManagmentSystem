@@ -65,6 +65,7 @@ public class LoginController implements Initializable{
         }
         this.comboClientAdmin.setItems(
                 FXCollections.observableArrayList(LoginOption.values()));
+        this.comboClientAdmin.getSelectionModel().selectFirst();
     }
     
     @FXML
@@ -126,7 +127,7 @@ public class LoginController implements Initializable{
             Pane root = loader.load(resource.openStream());
             AdminsController controller = (AdminsController)loader
                     .getController();
-            controller.setId(id);
+            controller.setLoggedInAdminID(id);
             Scene scene = new Scene(root);
             Stage adminStage = new Stage();
             adminStage.setScene(scene);

@@ -157,13 +157,12 @@ public class ClientDAO implements ObligationDAO<ClientDTO>{
         return clients;
     }
 
-    @Override
-    public List<ClientDTO> search(String filter, String regExp) {
+    public List<ClientDTO> search(ClientSearchType filter, String regExp) {
         PreparedStatement ps;
         ResultSet rs;
         List<ClientDTO> clients = new ArrayList<>();
-        String cmd = "SELECT * FROM clients WHERE " + filter + " LIKE '%" +
-                regExp + "%';";
+        String cmd = "SELECT * FROM clients WHERE " + filter.toString() + 
+                     " LIKE '%" + regExp + "%';";
         System.out.println("SQL = " + cmd);
         try {
             ps = connector.getConnection().prepareStatement(cmd);

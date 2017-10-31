@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.chart.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.effect.*?>
@@ -9,7 +10,6 @@
 <?import javafx.scene.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
 
 <AnchorPane id="AnchorPane" prefHeight="720.0" prefWidth="1200.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="bankmanager.admins.AdminsController">
    <children>
@@ -56,24 +56,29 @@
                                           <Font size="15.0" />
                                        </font>
                                     </TextField>
-                                    <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
+                                    <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="8.0">
                                        <children>
-                                          <Button fx:id="btnInsertAdmin" mnemonicParsing="false" text="Insert" />
-                                          <Button fx:id="btnUpdateAdmin" mnemonicParsing="false" text="Update" />
-                                          <Button fx:id="btnDeleteAdmin" mnemonicParsing="false" text="Delete" />
-                                          <Button fx:id="btnReloadAdminTable" mnemonicParsing="false" text="Reload" />
-                                          <Button fx:id="btnClearAdminForm" mnemonicParsing="false" text="Clear" />
+                                          <Button fx:id="btnInsertAdmin" mnemonicParsing="false" onAction="#onBtnInsertAdminClicked" prefHeight="25.0" prefWidth="60.0" text="Insert" />
+                                          <Button fx:id="btnUpdateAdmin" mnemonicParsing="false" onAction="#onBtnUpdateAdminClicked" prefHeight="25.0" prefWidth="67.0" text="Update" />
+                                          <Button fx:id="btnDeleteAdmin" mnemonicParsing="false" onAction="#onBtnDeleteAdminClicked" text="Delete" />
+                                          <Button fx:id="btnReloadAdminTable" mnemonicParsing="false" onAction="#onBtnReloadAdminTable" text="Reload" />
+                                          <Button fx:id="btnClearAdminForm" mnemonicParsing="false" onAction="#onBtnClearAdminsForm" prefWidth="52.0" text="Clear" />
                                        </children>
                                     </HBox>
-                                    <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="15.0">
+                                    <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="5.0">
                                        <children>
-                                          <TextField fx:id="inputAdminSearchField" prefHeight="25.0" prefWidth="247.0" />
-                                          <Button fx:id="btnSearchAdmin" mnemonicParsing="false" text="Search" />
+                                          <TextField fx:id="inputAdminSearchField" prefHeight="25.0" prefWidth="258.0" />
+                                          <Button fx:id="btnSearchAdmin" mnemonicParsing="false" onAction="#onBtnSearchForAdmin" text="Search" />
                                        </children>
                                        <VBox.margin>
                                           <Insets left="10.0" />
                                        </VBox.margin>
                                     </HBox>
+                                    <ComboBox fx:id="comboAdminSearch" prefHeight="25.0" prefWidth="332.0" promptText="Search filter">
+                                       <VBox.margin>
+                                          <Insets left="10.0" />
+                                       </VBox.margin>
+                                    </ComboBox>
                                  </children>
                               </VBox>
                               <TableView fx:id="tableAdmins" prefHeight="720.0" prefWidth="900.0">
@@ -104,12 +109,12 @@
                                     </TextField>
                                     <TextField promptText="First name" />
                                     <TextField promptText="Surname" />
-                                    <DatePicker prefHeight="25.0" prefWidth="295.0" promptText="Date of birth" />
-                                    <ComboBox prefHeight="25.0" prefWidth="299.0" promptText="Gender" />
+                                    <DatePicker fx:id="dobClient" prefHeight="25.0" prefWidth="295.0" promptText="Date of birth" />
+                                    <ComboBox fx:id="comboGender" prefHeight="25.0" prefWidth="299.0" promptText="Gender" />
                                     <TextField promptText="Address" />
                                     <TextField promptText="Phone" />
                                     <TextField promptText="E-mail" />
-                                    <ComboBox prefHeight="25.0" prefWidth="296.0" promptText="Account type" />
+                                    <ComboBox fx:id="comboAccount" prefHeight="25.0" prefWidth="296.0" promptText="Account type" />
                                     <TextField promptText="Balance" />
                                     <TextField promptText="Password" />
                                     <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0" spacing="10.0">
@@ -137,21 +142,33 @@
                                     <Insets left="10.0" right="10.0" />
                                  </padding>
                               </VBox>
-                              <TableView fx:id="tableClients" prefHeight="720.0" prefWidth="900.0">
-                                <columns>
-                                  <TableColumn fx:id="colClientsID" prefWidth="33.0" text="ID" />
-                                  <TableColumn fx:id="colClientsName" prefWidth="102.0" text="First name" />
-                                    <TableColumn fx:id="colClientsSurname" prefWidth="111.0" text="Surname" />
-                                    <TableColumn fx:id="colClientsDOB" prefWidth="66.0" text="DOB" />
-                                    <TableColumn fx:id="colClientsGender" prefWidth="78.0" text="Gender" />
-                                    <TableColumn fx:id="colClientsAddress" prefWidth="83.0" text="Address" />
-                                    <TableColumn fx:id="colClientsPhone" prefWidth="75.0" text="Phone" />
-                                    <TableColumn fx:id="colClientsEmail" prefWidth="62.0" text="E-mail" />
-                                    <TableColumn fx:id="colClientsAccount" prefWidth="74.0" text="Account" />
-                                    <TableColumn fx:id="colClientsBalance" prefWidth="66.0" text="Balance" />
-                                    <TableColumn fx:id="colClientsPassword" prefWidth="91.0" text="Password" />
-                                </columns>
-                              </TableView>
+                              <VBox prefHeight="720.0" prefWidth="900.0">
+                                 <children>
+                                    <TableView fx:id="tableClients" prefHeight="360.0" prefWidth="900.0">
+                                      <columns>
+                                        <TableColumn fx:id="colClientsID" prefWidth="33.0" text="ID" />
+                                        <TableColumn fx:id="colClientsName" prefWidth="102.0" text="First name" />
+                                          <TableColumn fx:id="colClientsSurname" prefWidth="111.0" text="Surname" />
+                                          <TableColumn fx:id="colClientsDOB" prefWidth="66.0" text="DOB" />
+                                          <TableColumn fx:id="colClientsGender" prefWidth="78.0" text="Gender" />
+                                          <TableColumn fx:id="colClientsAddress" prefWidth="83.0" text="Address" />
+                                          <TableColumn fx:id="colClientsPhone" prefWidth="75.0" text="Phone" />
+                                          <TableColumn fx:id="colClientsEmail" prefWidth="62.0" text="E-mail" />
+                                          <TableColumn fx:id="colClientsAccount" prefWidth="74.0" text="Account" />
+                                          <TableColumn fx:id="colClientsBalance" prefWidth="66.0" text="Balance" />
+                                          <TableColumn fx:id="colClientsPassword" prefWidth="91.0" text="Password" />
+                                      </columns>
+                                    </TableView>
+                                    <BarChart prefHeight="360.0" prefWidth="900.0" title="Bar chart">
+                                      <xAxis>
+                                        <CategoryAxis side="BOTTOM" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis side="LEFT" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
                      </children>

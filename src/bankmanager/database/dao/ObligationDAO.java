@@ -13,5 +13,4 @@ public interface ObligationDAO<T> {
     public boolean delete(Object key);
     public T readById(Object key);
     public List<T> readAll();
-    public List<T> search(String filter, String regExp);  
 }
